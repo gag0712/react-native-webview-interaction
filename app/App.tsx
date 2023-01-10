@@ -1,33 +1,28 @@
-import React, {useRef} from 'react';
-import {Alert, Pressable, SafeAreaView, Text, View} from 'react-native';
-import WebView from 'react-native-webview';
+import React, {useEffect} from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {HomeScreen, AScreen} from './src/screens';
 
+export type RootStackParamList = {HomeScreen: undefined; AScreen: undefined};
+const RootStack = createNativeStackNavigator<RootStackParamList>();
+declare global {
+  namespace ReactNavigation {
+    interface RootParamList extends RootStackParamList {}
+  }
+}
 const App = () => {
-  const webViewRef = useRef<WebView>(null);
+  useEffect(() => {
+    AsyncStorage.setItem('key1', 'value1');
+    AsyncStorage.setItem('key2', 'value2');
+  }, []);
   return (
-    <SafeAreaView style={{flex: 1}}>
-      <View style={{height: '50%', justifyContent: 'center'}}>
-        <Pressable
-          onPress={() => {
-            console.log('App to Web');
-            webViewRef.current?.postMessage(
-              JSON.stringify({type: 'myType', data: 'doSomething'}),
-            );
-          }}
-          style={{alignItems: 'center'}}>
-          <Text>App to Web</Text>
-        </Pressable>
-      </View>
-      <WebView
-        ref={webViewRef}
-        javaScriptEnabled={true}
-        onMessage={event => {
-          console.log(event);
-          Alert.alert(event.nativeEvent.data);
-        }}
-        source={{uri: '10.0.2.2:3000'}}
-      />
-    </SafeAreaView>
+    <NavigationContainer>
+      <RootStack.Navigator>
+        <RootStack.Screen name="HomeScreen" component={HomeScreen} />
+        <RootStack.Screen name="AScreen" component={AScreen} />
+      </RootStack.Navigator>
+    </NavigationContainer>
   );
 };
 

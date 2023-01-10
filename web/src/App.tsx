@@ -1,39 +1,37 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
+import {
+  navigate,
+  setAsyncStorage,
+  useGetAsyncStorage,
+  useIsReactNativeWebView,
+} from "./utils";
 
 function App() {
-  const [data, setData] = useState<any>();
-  const listener = (event: any) => {
-    const { type, data } = JSON.parse(event.data);
-    if (type) {
-      setData(data);
-    }
-  };
-  useEffect(() => {
-    (() => {
-      /** android */
-      document.addEventListener("message", listener);
-      /** ios */
-      window.addEventListener("message", listener);
-    })();
-    return () => {
-      document.removeEventListener("message", listener);
-      window.removeEventListener("message", listener);
-    };
-  }, []);
+  const isWebView = useIsReactNativeWebView();
+  const { isLoading, data, isError } = useGetAsyncStorage("key3");
 
   return (
     <div className="App">
       <div style={{ justifyContent: "center" }}>
         <div
           onClick={() => {
-            window.ReactNativeWebView.postMessage("asdf");
+            window.ReactNativeWebView.postMessage(isWebView.toString());
           }}
           style={{ alignItems: "center" }}
         >
           Web to App
         </div>
-        {data}
+        <div
+          onClick={() => {
+            navigate("AScreen");
+          }}
+        >
+          go to AScreen
+        </div>
+
+        {isLoading ? "no" : data}
+        {isError.toString()}
       </div>
     </div>
   );
